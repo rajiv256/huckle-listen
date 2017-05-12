@@ -3,11 +3,11 @@
 
 For running
 
-make iso
+sudo make iso
 
-make run
+sudo make run
 
-make clean
+sudo make clean
 
 
 Qemu, xorriso, nasm are needed to be installed.
