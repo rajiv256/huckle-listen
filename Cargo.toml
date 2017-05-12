@@ -1,0 +1,46 @@
+[package] 
+name="ouros"
+version="0.1.0"
+authors=["rajiv"]
+
+[lib]
+crate-type=["staticlib"]
+
+[dependencies]
+rlibc = "*"
+spin = "0.4.5"
+multiboot2 = "0.1.0"
+bitflags = "0.7.0"
+x86_64 = "0.1.2"
+x86 = "0.8.1"
+once = "0.3.2"
+bit_field = "0.7.0"
+cpuio = "0.2.0"
+
+
+[dependencies.bump_allocator]
+path = "libs/bump_allocator"
+
+
+[dependencies.hole_list_allocator]
+path = "libs/hole_list_allocator"
+
+[dependencies.cpu]
+path = "libs/libcpu"
+
+[dependencies.coreio]
+path = "libs/core-io"
+
+
+[dependencies.lazy_static]
+version = "0.2.5"
+features = ["spin_no_std"]
+
+[profile.dev]
+panic = "abort"
+
+# The release profile, used for `cargo build --release`.
+[profile.release]
+panic = "abort"
+
+
