@@ -152,8 +152,7 @@ pub fn print_something() {
         buffer: unsafe { Unique::new(0xb8000 as *mut _) },
     };
 
-    // writer.write_byte(b'H');
-    // writer.write_str("Rajiv has the hots for Prateek");
+    // writer.write_byte(b'H') ; 
     // writer.write_str("1+2={}",1+2);
     // write!(writer, "Hello World!");
     loop {
