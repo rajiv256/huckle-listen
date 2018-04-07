@@ -16,6 +16,7 @@ const TCR:u16     = 0x40 ;
 const RCR:u16     = 0x44 ;
 const MPC:u16     = 0x4C ;
 const MULINT:u16  = 0x5C ;
+const CBR: u16    = 0x3A ;
 
  /* TSD register commands */
 const TxHostOwns:u32  = 0x2000 ;
@@ -72,6 +73,9 @@ pub struct Rtl8139 {
   mpc:Port,
   mulint:Port,
   isr: Port,
+  ersr: Port,
+  capr: Port,
+  cbr : Port,
 }
 
 impl Rtl8139 { // TODO(ryan): is there already a frame oriented interface in std libs to implement?
@@ -101,7 +105,10 @@ impl Rtl8139 { // TODO(ryan): is there already a frame oriented interface in std
       mulint: p(MULINT),
       imr: p(IMR),
       mpc: p(MPC),
-      isr: p(ISR)
+      isr: p(ISR),
+      ersr:p(0x0036),
+      capr: p(CAPR),
+      cbr: p(CBR)
 
     };
     card.init() ;
@@ -147,7 +154,7 @@ impl Driver for Rtl8139 {
 
     //This is the RCR register. Setting the values of AB(Accept Broadcast message, AM (Acc Multicast message),
     // APM (Acc packet which matches with MAC) , AAP (Acc all packets), Wrap (1<<7))
-    self.config_rx.out16(((1 << 12) | (1 << 8) | (1 << 7) | (1 << 3) | (1 << 2) | (1 << 1))) ;
+    self.config_rx.out32(0x0002b6a1) ;
     Port::io_wait() ;
 
     //init missed packet counter
@@ -160,10 +167,11 @@ impl Driver for Rtl8139 {
 
   }
   fn listen(&mut self) {
-    while ((self.command_register.in16() & RxBufEmpty) != RxBufEmpty){
-      Port::io_wait() ;
-    }
-    let mut isr: u16 = self.isr.in16() ;
+      loop {
+          let mut x = 1 ; while x<100000000 {x += 1 ;}
+          println!("RxBufEmpty:- 0x{:x}",self.command_register.in16() & RxBufEmpty) ;
+      }
+
   }
 
 
@@ -173,8 +181,8 @@ impl NetworkDriver for Rtl8139
 {
   fn put_frame(&mut self, buf: &[u8]) -> Result<usize, u32> {
 
-    // self.transmit_address[self.descriptor].out32(buf.as_ptr() as u32); // Give the address of the beginning of the packet.
-    // Port::io_wait() ;
+    self.transmit_address[self.descriptor].out32(buf.as_ptr() as u32); // Give the address of the beginning of the packet.
+    Port::io_wait() ;
 
     // while(self.transmit_status[self.descriptor].in32() & (1<<15) != 0x0) {}
     println!("{:?}*******transmit_status before 0x{:x}",self.descriptor as u32, self.transmit_status[self.descriptor].in32() as u32) ;
@@ -190,12 +198,7 @@ impl NetworkDriver for Rtl8139
     self.transmit_status[self.descriptor].out32(self.transmit_status[self.descriptor].in32()^(1<<13));
     Port::io_wait() ;
     println!("transmit_status after 0x{:x}",self.transmit_status[self.descriptor].in32() as u32 & 0x2e) ;
-    // println!("Came out isr : 0x{:x}",self.isr.in16()) ;
-    // while (self.transmit_status[self.descriptor].in32() & (1<<13)) == 1 {
-    //     //println!("status : 0x{:x}",self.transmit_status[self.descriptor].in32()) ;
-    //     let mut tmp = 0 ;
-    // }
-    println!("Transmitted!"  );
+
 
 
     self.descriptor = (self.descriptor + 1) % 4 ;
@@ -227,31 +230,31 @@ impl NetworkDriver for Rtl8139
 
       //This is the RCR register. Setting the values of AB(Accept Broadcast message, AM (Acc Multicast message),
       // APM (Acc packet which matches with MAC) , AAP (Acc all packets), Wrap (1<<7))
-      self.config_rx.out16(((1 << 12) | (1 << 8) | (1 << 7) | (1 << 3) | (1 << 2) | (1 << 1))) ;
+      self.config_rx.out32(0x0002b6a1) ;
       Port::io_wait() ;
 
       //init missed packet counter
       self.mpc.out16(0x00) ;
       Port::io_wait() ;
 
-      // No early rx-interrupts
-      self.mulint.out16(self.mulint.in16()&0xf000) ;
-      Port::io_wait() ;
+      // // No early rx-interrupts
+      // self.mulint.out16(self.mulint.in16()&0xf000) ;
+      // Port::io_wait() ;
 
   }
   fn nic_interrupt_handler(&mut self) {
 
 
-      let mut isr: u32 = self.isr.in32() ;
+      let mut isr: u16 = self.isr.in16() ;
 
      //Some thing to be done for transmission interrupt.
 
      //For receive.
-     if (isr & RxErr as u32 !=0) {
+     if (isr & RxErr as u16 !=0) {
         /* TODO: Need detailed analysis of error status */
         println!("receive err interrupt");
      }
-     if (isr & RxOK as u32 != 0) {
+     if (isr & RxOK as u16 != 0) {
         println!("Interrupt handler entered!");
         while ((self.command_register.in16() & RxBufEmpty)==0) {
           let mut rx_status : u32 = 0 ;
