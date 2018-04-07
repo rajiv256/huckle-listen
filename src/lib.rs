@@ -95,7 +95,7 @@ pub extern "C" fn rust_main(multiboot_information_address: usize) {
     println!("Getting drivers -- lib.rs");
     pci.get_drivers() ;
 
-    
+
 
 
 

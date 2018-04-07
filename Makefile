@@ -38,7 +38,11 @@ $(kernel): cargo $(rust_os) $(assembly_object_files) $(linker_script)
 
 
 cargo:
+<<<<<<< HEAD
 	@/home/rajiv/.cargo/bin/cargo build --target $(target) --verbose
+=======
+	@cargo build --target $(target)
+>>>>>>> fa41f9a291d456bb17cf6f7bc0dca3653eae82bb
 # compile assembly files
 build/arch/$(arch)/%.o: src/arch/$(arch)/%.asm
 	@mkdir -p $(shell dirname $@)

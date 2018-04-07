@@ -26,7 +26,6 @@ use ::net::NetworkStack ;
 use pci::{PciManifest, PortGranter};
 
 
-
 lazy_static! {
     static ref IDT: Idt = {
         let mut idt = Idt::new();
@@ -35,6 +34,7 @@ lazy_static! {
                 .set_stack_index(DOUBLE_FAULT_IST_INDEX as u16);
         }
         idt.breakpoint.set_handler_fn(breakpoint_handler);
+
 
 idt.interrupts[0].set_handler_fn(timer_handler) ;
 idt.interrupts[1].set_handler_fn(keyboard_handler) ;
@@ -52,6 +52,7 @@ idt.interrupts[12].set_handler_fn(handler12) ;
 idt.interrupts[13].set_handler_fn(handler13) ;
 idt.interrupts[14].set_handler_fn(handler14) ;
 idt.interrupts[15].set_handler_fn(handler15) ;
+
 
         idt
     };

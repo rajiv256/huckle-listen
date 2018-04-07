@@ -21,7 +21,7 @@ pub trait NetworkDriver: Driver
   fn put_frame(&mut self, buf: &[u8]) -> Result<usize,u32> ;
 
   fn nic_interrupt_handler(&mut self) ;
-  fn reset_init(&mut self) ; 
+  fn reset_init(&mut self) ;
 
 }
 

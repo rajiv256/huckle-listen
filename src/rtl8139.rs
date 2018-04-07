@@ -169,7 +169,7 @@ impl Driver for Rtl8139 {
   fn listen(&mut self) {
       loop {
           let mut x = 1 ; while x<100000000 {x += 1 ;}
-          println!("RxBufEmpty:- 0x{:x}",self.command_register.in16() & RxBufEmpty) ;
+
       }
 
   }
