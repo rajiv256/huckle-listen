@@ -175,11 +175,6 @@ impl Exception {
 			19 => Exception::Simd,
 			20 => Exception::Virtualization,
 			30 => Exception::Security,
-<<<<<<< HEAD
-
-=======
-			
->>>>>>> fa41f9a291d456bb17cf6f7bc0dca3653eae82bb
 			_ => return None
 		})
 	}

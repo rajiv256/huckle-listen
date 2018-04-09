@@ -1,6 +1,9 @@
+#![feature(inclusive_range_syntax)]
+
 use peripherals::mycpu::Port;
 use driver::{Driver, NetworkDriver};
 use pci::{PciManifest, PortGranter};
+
 
 ///////////////////////////MACROS////////////////////////////////////
 
@@ -133,11 +136,11 @@ impl Driver for Rtl8139 {
     self.command_register.out8(0x10); // Software reset
     Port::io_wait() ;
 
-
-
     while (self.command_register.in8() & 0x10) != 0 { } // Wait till the RST(RESET) bit is set to 0.
 
     //configuring RBSTART. Put the start address of recv buffer into the RBSTART port.
+
+    println!("the start :- 0x{:x}",self.rx_ring.as_ptr() as u32);
     self.rbstart.out32(self.rx_ring.as_ptr() as u32) ;
     Port::io_wait() ;
 
@@ -167,8 +170,18 @@ impl Driver for Rtl8139 {
 
   }
   fn listen(&mut self) {
+
+
+
       loop {
           let mut x = 1 ; while x<100000000 {x += 1 ;}
+          let mut cbr :u16 = self.cbr.in16() ;
+          let mut rx_ring = self.rbstart.in32() as *mut u32 ;
+          for i in 0..cbr {
+              print!("{:x}",unsafe { *rx_ring as u8}) ;
+              rx_ring = (rx_ring as u32 + 1) as *mut u32 ;
+          }
+          println!("              \n\n\n\n\n") ;
 
       }
 
@@ -213,9 +226,11 @@ impl NetworkDriver for Rtl8139
 
       while (self.command_register.in8() & 0x10) != 0 { } // Wait till the RST(RESET) bit is set to 0.
 
+
+      println!("the start :- 0x{:x}",self.rx_ring.as_ptr() as u32);
       //configuring RBSTART. Put the start address of recv buffer into the RBSTART port.
-      self.rbstart.out32(self.rx_ring.as_ptr() as u32) ;
-      Port::io_wait() ;
+      // self.rbstart.out32(self.rx_ring.as_ptr() as u32) ;
+      // Port::io_wait() ;
 
 
       self.command_register.out8(0x0C); // enable transmit and receive. --> 0x08|0x04 (Important)

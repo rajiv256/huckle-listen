@@ -58,13 +58,9 @@ struct ScreenChar {
 }
 
 
-<<<<<<< HEAD
 const BUFFER_HEIGHT: usize = 30;
 const BUFFER_WIDTH: usize = 30;
-=======
-const BUFFER_HEIGHT: usize = 25;
-const BUFFER_WIDTH: usize = 32;
->>>>>>> fa41f9a291d456bb17cf6f7bc0dca3653eae82bb
+
 
 #[derive(Debug, Clone, Copy)]
 struct Buffer {
@@ -84,11 +80,8 @@ impl Writer {
             b'\n' => self.new_line(),
             byte => {
                 if self.column_position >= BUFFER_WIDTH {
-<<<<<<< HEAD
+
                     self.new_line();
-=======
-                    self.new_line();
->>>>>>> fa41f9a291d456bb17cf6f7bc0dca3653eae82bb
                 }
 
                 let row = BUFFER_HEIGHT - 1;
@@ -161,19 +154,8 @@ pub fn print_something() {
         buffer: unsafe { Unique::new(0xb8000 as *mut _) },
     };
 
-<<<<<<< HEAD
-    // writer.write_byte(b'H');
-    // writer.write_str("Rajiv has the hots for Prateek");
-    // writer.write_str("1+2={}",1+2);
-    // write!(writer, "Hello World!");
+
     loop {
 
-=======
-    // writer.write_byte(b'H') ;
-    // writer.write_str("1+2={}",1+2);
-    // write!(writer, "Hello World!");
-    loop {
-
->>>>>>> fa41f9a291d456bb17cf6f7bc0dca3653eae82bb
     }
 }
