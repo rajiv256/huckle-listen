@@ -171,17 +171,22 @@ impl Driver for Rtl8139 {
   }
   fn listen(&mut self) {
 
-
+      let mut packet : [u8 ; 256] = [0 ; 256] ;
 
       loop {
           let mut x = 1 ; while x<100000000 {x += 1 ;}
           let mut cbr :u16 = self.cbr.in16() ;
           let mut rx_ring = self.rbstart.in32() as *mut u32 ;
+          print!("{:x}-",unsafe {*rx_ring as u16}) ;
+          rx_ring = (rx_ring as u32 + 2) as *mut u32 ;
+          print!("{:x}-",unsafe {*rx_ring as u16}) ;
+          rx_ring = (rx_ring as u32 + 2) as *mut u32 ;
           for i in 0..cbr {
-              print!("{:x}",unsafe { *rx_ring as u8}) ;
+              print!("{:?}|",unsafe { *rx_ring as u8}) ;
               rx_ring = (rx_ring as u32 + 1) as *mut u32 ;
           }
           println!("              \n\n\n\n\n") ;
+         break ;
 
       }
 
@@ -245,7 +250,7 @@ impl NetworkDriver for Rtl8139
 
       //This is the RCR register. Setting the values of AB(Accept Broadcast message, AM (Acc Multicast message),
       // APM (Acc packet which matches with MAC) , AAP (Acc all packets), Wrap (1<<7))
-      self.config_rx.out32(0x0002b6a1) ;
+      self.config_rx.out32(0x0002b6b1) ;
       Port::io_wait() ;
 
       //init missed packet counter
