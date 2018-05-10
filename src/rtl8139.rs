@@ -3,6 +3,7 @@
 use peripherals::mycpu::Port;
 use driver::{Driver, NetworkDriver};
 use pci::{PciManifest, PortGranter};
+use collections::Vec;
 
 
 ///////////////////////////MACROS////////////////////////////////////
@@ -125,6 +126,21 @@ impl Rtl8139 { // TODO(ryan): is there already a frame oriented interface in std
 
 }
 
+fn extract_payload(packet : &mut [u8; 256]) -> Vec<char> {
+    let mut payload_begin = 46 ;
+    let mut len = 18 ;
+    let mut raw : Vec<char> = Vec::new() ;
+    for i in 0..len {
+        if (packet[payload_begin+i]==0){
+            break ;
+        }
+        raw.push(packet[i] as char) ;
+    }
+    raw
+}
+
+
+
 impl Driver for Rtl8139 {
 
   fn init(&mut self) {
@@ -169,6 +185,7 @@ impl Driver for Rtl8139 {
     // Port::io_wait() ;
 
   }
+  // Refer to the Notes file for information about a single packet.
   fn listen(&mut self) {
 
       let mut packet : [u8 ; 256] = [0 ; 256] ;
@@ -177,12 +194,12 @@ impl Driver for Rtl8139 {
           let mut x = 1 ; while x<100000000 {x += 1 ;}
           let mut cbr :u16 = self.cbr.in16() ;
           let mut rx_ring = self.rbstart.in32() as *mut u32 ;
-          print!("{:x}-",unsafe {*rx_ring as u16}) ;
+          print!("0-{:x}|",unsafe {*rx_ring as u16}) ;
           rx_ring = (rx_ring as u32 + 2) as *mut u32 ;
-          print!("{:x}-",unsafe {*rx_ring as u16}) ;
+          print!("2-{:x}|",unsafe {*rx_ring as u16}) ;
           rx_ring = (rx_ring as u32 + 2) as *mut u32 ;
           for i in 0..cbr {
-              print!("{:?}|",unsafe { *rx_ring as u8}) ;
+              print!("{:?}-{:?}|",i+4,unsafe { *rx_ring as u8}) ;
               rx_ring = (rx_ring as u32 + 1) as *mut u32 ;
           }
           println!("              \n\n\n\n\n") ;
@@ -191,9 +208,15 @@ impl Driver for Rtl8139 {
       }
 
   }
+  // fn extract_payload(&mut self, packet: &mut [u8; 256]) -> {
+  //
+  // }
+
 
 
 }
+
+
 
 impl NetworkDriver for Rtl8139
 {

@@ -1,0 +1,30 @@
+1. Received Packet Structure
+
+    Total packet size := 72 bytes
+    |
+    |--- 2 bytes packet header
+    |--- 2 bytes size (without final CRC)
+    |--- 60 bytes data
+         |___ 14 byte EthernetHeader
+              |___ 6 bytes dest macaddr
+              |___ 6 bytes source macaddr
+              |___ 2 bytes type of packet (optional)
+         |___ 20 byte IpHeader
+              |___ 1 byte version_length
+              |___ 1 byte tos
+              |___ 2 bytes length
+              |___ 3 bytes id
+              |___ 1 byte flags_fragment
+              |___ 1 byte ttl
+              |___ 1 byte protocol
+              |___ 2 byte crc
+              |___ 4 bytes dest IP
+              |___ 4 bytes source IP
+         |___ 8 byte UdpHeader
+              |___ 2 bytes destination_port
+              |___ 2 bytes source_port
+              |___ 2 bytes length
+              |___ 2 bytes crc
+         |___ 18 byte Load
+  |___ 4 bytes of CRC
+  |___ 4 bytes of normal zeroes

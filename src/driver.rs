@@ -6,6 +6,7 @@ use io::{Reader,Writer} ;
 pub trait Driver {
   fn init(&mut self);
   fn listen(&mut self);
+
 }
 
 pub trait DriverManager {
@@ -17,11 +18,10 @@ pub trait DriverManager {
 pub trait NetworkDriver: Driver
 {
   fn address(&mut self) -> [u8; 6];
-
   fn put_frame(&mut self, buf: &[u8]) -> Result<usize,u32> ;
-
   fn nic_interrupt_handler(&mut self) ;
   fn reset_init(&mut self) ;
+  
 
 }
 
