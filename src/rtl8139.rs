@@ -189,21 +189,21 @@ impl Driver for Rtl8139 {
   fn listen(&mut self) {
 
       let mut packet : [u8 ; 256] = [0 ; 256] ;
-
+      let mut pbp = 0 as u16 ;
+      let mut rx_ring = self.rbstart.in32() as *mut u32 ;
       loop {
           let mut x = 1 ; while x<100000000 {x += 1 ;}
           let mut cbr :u16 = self.cbr.in16() ;
-          let mut rx_ring = self.rbstart.in32() as *mut u32 ;
-          print!("0-{:x}|",unsafe {*rx_ring as u16}) ;
+          print!("{:?}-{:?}|",pbp,cbr) ;
+          // print!("0-{:x}|",unsafe {*rx_ring as u16}) ;
           rx_ring = (rx_ring as u32 + 2) as *mut u32 ;
-          print!("2-{:x}|",unsafe {*rx_ring as u16}) ;
+          // print!("2-{:x}|",unsafe {*rx_ring as u16}) ;
           rx_ring = (rx_ring as u32 + 2) as *mut u32 ;
-          for i in 0..cbr {
-              print!("{:?}-{:?}|",i+4,unsafe { *rx_ring as u8}) ;
+          for i in pbp..cbr {
               rx_ring = (rx_ring as u32 + 1) as *mut u32 ;
           }
+          pbp = cbr ;
           println!("              \n\n\n\n\n") ;
-         break ;
 
       }
 
